@@ -20,18 +20,22 @@ end
 
 
 get '/' do
-
+  callback = params['callback']
+  content_type :js
   ip =  request.ip
-  ip_details(ip)
-  
+  json_result = ip_details(ip)
+  "#{callback}(#{json_result})"
 end
 
 
-get '/:ip' do
-  
-  ip = params[:ip]
-  ip_details(ip)
 
+
+get '/:ip' do
+  callback = params['callback']
+  content_type :js
+  ip = params[:ip]
+  json_result = ip_details(ip)
+  "#{callback}(#{json_result})"
 end
 
 
