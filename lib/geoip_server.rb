@@ -19,23 +19,19 @@ configure :production do
   end
 end
 
+
 get '/' do
-  %Q{
-    <html><title>Detect a computer's location by IP address</title>
-    <body style='line-height: 1.8em; font-family: Archer, Museo, Helvetica, Georgia; font-size 25px; text-align: center; padding-top: 20%;'>
-      Lookup a location by IP address. Example:
-      <pre style='font-family: Iconsolata, monospace;background-color:#EEE'>curl http://#{request.host}/207.97.227.239</pre>
-      <br />
-      <form action=/ method=GET onsubmit='if(\"\"==this.ip.value)return false;else{this.action=\"/\"+this.ip.value}'>
-        <input type=text name='ip' value='#{request.env['HTTP_X_REAL_IP']}' />
-        <input type=submit value='Lookup!' />
-      </form>
-      <div>None of this would be possible without <a href='http://www.maxmind.com/app/geolitecity'>MaxMind</a></div>
-    </body></html>
-}
+    capturedIp = {request.env['HTTP_X_REAL_IP']}.to_s
+    ipDetails(capturedIp)
 end
 
+
 get '/:ip' do
+    ipDetails(:ip)
+end
+
+
+def ipDetails(:ip)
   pass unless params[:ip] =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
   data = GeoIP.new(data_file).city(params[:ip])
@@ -46,8 +42,8 @@ get '/:ip' do
   return "{}" unless data
 
   ActiveSupport::JSON.encode(encode(data))
-
 end
+
 
 def encode data
   {
