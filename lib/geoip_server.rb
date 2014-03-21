@@ -21,7 +21,7 @@ end
 
 get '/' do
 
-  ip = request.env['HTTP_X_REAL_IP']
+  ip =  request.ip
   ip_details(ip)
   
 end
