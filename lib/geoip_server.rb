@@ -18,12 +18,14 @@ configure :production do
   end
 end
 
+
 get '/' do
 
   ip = request.env['HTTP_X_REAL_IP']
   ip_details(ip)
   
 end
+
 
 get '/:ip' do
   
@@ -47,6 +49,7 @@ def ip_details(ip)
 
   ActiveSupport::JSON.encode(encode(data))
 end
+
 
 def encode data
   {
