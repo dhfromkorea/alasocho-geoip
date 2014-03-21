@@ -19,6 +19,12 @@ configure :production do
 end
 
 
+def get_or_post(path, opts={}, &block)
+  get(path, opts, &block)
+  post(path, opts, &block)
+end
+
+
 get_or_post '/' do
   callback = params['callback']
   content_type :js
@@ -36,11 +42,6 @@ get_or_post '/:ip' do
   "#{callback}(#{json_result})"
 end
 
-
-def get_or_post(path, opts={}, &block)
-  get(path, opts, &block)
-  post(path, opts, &block)
-end
 
 
 def ip_details(ip)
