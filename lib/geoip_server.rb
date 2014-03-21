@@ -50,9 +50,12 @@ def ip_details(ip)
   pass unless ip =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
 
   data = GeoIP.new(data_file).city(ip)
-
+  client_url = "https://plivo.com"
   content_type 'application/json;charset=ascii-8bit'
   headers['Cache-Control'] = "public; max-age=#{365*24*60*60}"
+  headers['Access-Control-Allow-Origin'] = "#{client_url}"
+
+
 
   return "{}" unless data
 
