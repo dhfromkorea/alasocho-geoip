@@ -5,7 +5,6 @@ require 'geoip'
 require 'i18n'
 require 'active_support'
 
-data_file = File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'GeoLiteCity.dat'))
 
 ## Application
 
@@ -20,25 +19,26 @@ configure :production do
 end
 
 get '/' do
-  %Q{
-    <html><title>Detect a computer's location by IP address</title>
-    <body style='line-height: 1.8em; font-family: Archer, Museo, Helvetica, Georgia; font-size 25px; text-align: center; padding-top: 20%;'>
-      Lookup a location by IP address. Example:
-      <pre style='font-family: Iconsolata, monospace;background-color:#EEE'>curl http://#{request.host}/207.97.227.239</pre>
-      <br />
-      <form action=/ method=GET onsubmit='if(\"\"==this.ip.value)return false;else{this.action=\"/\"+this.ip.value}'>
-        <input type=text name='ip' value='#{request.env['HTTP_X_REAL_IP']}' />
-        <input type=submit value='Lookup!' />
-      </form>
-      <div>None of this would be possible without <a href='http://www.maxmind.com/app/geolitecity'>MaxMind</a></div>
-    </body></html>
-}
+
+  ip = request.env['HTTP_X_REAL_IP']
+  ip_details(ip)
+  
 end
 
 get '/:ip' do
-  pass unless params[:ip] =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+  
+  ip = params[:ip]
+  ip_details(ip)
 
-  data = GeoIP.new(data_file).city(params[:ip])
+end
+
+
+def ip_details(ip)
+  data_file = File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'GeoLiteCity.dat'))
+  
+  pass unless ip =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+
+  data = GeoIP.new(data_file).city(ip)
 
   content_type 'application/json;charset=ascii-8bit'
   headers['Cache-Control'] = "public; max-age=#{365*24*60*60}"
@@ -46,7 +46,6 @@ get '/:ip' do
   return "{}" unless data
 
   ActiveSupport::JSON.encode(encode(data))
-
 end
 
 def encode data
